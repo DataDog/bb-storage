@@ -3,9 +3,13 @@ package util
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
+	"sync"
+	"time"
 
-	configuration "github.com/buildbarn/bb-storage/pkg/proto/configuration/tls"
+	pb "github.com/buildbarn/bb-storage/pkg/proto/configuration/tls"
 
+	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -14,7 +18,7 @@ import (
 // object based on parameters specified in a Protobuf message for use
 // with a TLS client. This Protobuf message is embedded in Buildbarn
 // configuration files.
-func NewTLSConfigFromClientConfiguration(configuration *configuration.TLSClientConfiguration) (*tls.Config, error) {
+func NewTLSConfigFromClientConfiguration(configuration *pb.TLSClientConfiguration) (*tls.Config, error) {
 	if configuration == nil {
 		return nil, nil
 	}
@@ -46,7 +50,7 @@ func NewTLSConfigFromClientConfiguration(configuration *configuration.TLSClientC
 // object based on parameters specified in a Protobuf message for use
 // with a TLS server. This Protobuf message is embedded in Buildbarn
 // configuration files.
-func NewTLSConfigFromServerConfiguration(configuration *configuration.TLSServerConfiguration) (*tls.Config, error) {
+func NewTLSConfigFromServerConfiguration(configuration *pb.TLSServerConfiguration) (*tls.Config, error) {
 	if configuration == nil {
 		return nil, nil
 	}
@@ -55,12 +59,56 @@ func NewTLSConfigFromServerConfiguration(configuration *configuration.TLSServerC
 		ClientAuth: tls.RequestClientCert,
 	}
 
-	// Require the use of server-side certificates.
-	cert, err := tls.X509KeyPair([]byte(configuration.ServerCertificate), []byte(configuration.ServerPrivateKey))
-	if err != nil {
-		return nil, StatusWrap(err, "Failed to load X509 key pair")
+	switch backend := configuration.Backend.(type) {
+	case *pb.TLSServerConfiguration_Static:
+		// Require the use of server-side certificates.
+		cert, err := tls.X509KeyPair([]byte(backend.Static.ServerCertificate), []byte(backend.Static.ServerPrivateKey))
+		if err != nil {
+			return nil, StatusWrap(err, "Failed to load X509 key pair")
+		}
+		tlsConfig.Certificates = []tls.Certificate{cert}
+		break
+	case *pb.TLSServerConfiguration_Rotated:
+		switch issuerBackend := backend.Rotated.Issuer.(type) {
+		case *pb.RotatedTLSServerConfiguration_Filesystem:
+			dur, err := ptypes.Duration(issuerBackend.Filesystem.RefreshInterval)
+			if err != nil {
+				return nil, errors.New("Duration is invalid")
+			}
+
+			tlsConfig.GetCertificate = newFilesystemGetCertificateFunc(issuerBackend.Filesystem.ServerCertificatePath, issuerBackend.Filesystem.ServerPrivateKeyPath, dur)
+			break
+		default:
+			return nil, errors.New("Configuration did not contain a TLS certificate rotation issuer backend")
+		}
+
+		break
+	default:
+		return nil, errors.New("Configuration did not contain a TLS server backend") //TODO(griffin)
 	}
-	tlsConfig.Certificates = []tls.Certificate{cert}
 
 	return &tlsConfig, nil
+}
+
+func newFilesystemGetCertificateFunc(tlsCertFile, tlsKeyFile string, refreshTime time.Duration) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+	var (
+		err            error
+		cert           tls.Certificate
+		certCreateTime time.Time
+		muCert         sync.Mutex
+	)
+
+	return func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+		muCert.Lock()
+		defer muCert.Unlock()
+		if time.Since(certCreateTime) < refreshTime {
+			return &cert, nil
+		}
+		cert, err = tls.LoadX509KeyPair(tlsCertFile, tlsKeyFile)
+		if err != nil {
+			return nil, err
+		}
+		certCreateTime = time.Now()
+		return &cert, nil
+	}
 }

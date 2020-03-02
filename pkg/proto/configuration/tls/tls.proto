@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package buildbarn.configuration.tls;
 
+import "google/protobuf/duration.proto";
+
 option go_package = "github.com/buildbarn/bb-storage/pkg/proto/configuration/tls";
 
 message TLSClientConfiguration {
@@ -20,9 +22,30 @@ message TLSClientConfiguration {
 }
 
 message TLSServerConfiguration {
+    oneof backend {
+        buildbarn.configuration.tls.StaticTLSServerConfiguration static = 1;
+        buildbarn.configuration.tls.RotatedTLSServerConfiguration rotated = 2;  
+    }
+}
+
+message StaticTLSServerConfiguration {
   // PEM data for the certificate used by the TLS server.
   string server_certificate = 1;
 
   // PEM data for the private key used by the TLS server.
   string server_private_key = 2;
+}
+
+message RotatedTLSServerConfiguration {
+  oneof issuer {
+    FilesystemIssuer filesystem = 1;
+  }
+}
+
+message FilesystemIssuer {
+  string server_certificate_path = 1;
+
+  string server_private_key_path = 2;
+
+  google.protobuf.Duration refresh_interval = 3;
 }

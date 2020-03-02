@@ -265,3 +265,11 @@ def bb_storage_go_dependencies():
         commit = "7c0f6868bffe087073376feaab3ace57f2ef90b2",
         importpath = "github.com/mattn/go-ieproxy",
     )
+
+    go_repository(
+        name = "com_github_johanbrandhorst_certify",
+        importpath = "github.com/johanbrandhorst/certify",
+        sha256 = "6e4a7085d3241cde3947482850c94c7d9ad398aabbfc539b1829b79f65df6c7f",
+        strip_prefix = "certify-1.7.0",
+        urls = ["https://github.com/johanbrandhorst/certify/archive/v1.7.0.tar.gz"],
+    )

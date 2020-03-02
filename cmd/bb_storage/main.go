@@ -20,6 +20,7 @@ import (
 	"google.golang.org/genproto/googleapis/bytestream"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 )
 
@@ -105,6 +106,7 @@ func main() {
 					bytestream.RegisterByteStreamServer(s, cas.NewByteStreamServer(contentAddressableStorageBlobAccess, 1<<16))
 					remoteexecution.RegisterCapabilitiesServer(s, buildQueue)
 					remoteexecution.RegisterExecutionServer(s, buildQueue)
+					reflection.Register(s)
 				}))
 	}()
 
