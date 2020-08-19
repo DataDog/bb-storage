@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//pkg/proto/configuration/global:go_default_library",
         "//pkg/util:go_default_library",
+        "@com_github_datadog_opencensus_go_exporter_datadog//:go_default_library",
         "@com_github_golang_protobuf//ptypes:go_default_library_gen",
         "@com_github_prometheus_client_golang//prometheus:go_default_library",
         "@com_github_prometheus_client_golang//prometheus/push:go_default_library",

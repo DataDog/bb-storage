@@ -14,6 +14,7 @@ import (
 	"contrib.go.opencensus.io/exporter/jaeger"
 	prometheus_exporter "contrib.go.opencensus.io/exporter/prometheus"
 	"contrib.go.opencensus.io/exporter/stackdriver"
+	datadog "github.com/DataDog/opencensus-go-exporter-datadog"
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
@@ -41,6 +42,24 @@ func ApplyConfiguration(configuration *pb.Configuration) error {
 				return util.StatusWrap(err, "Failed to create the Jaeger exporter")
 			}
 			trace.RegisterExporter(je)
+		}
+
+		if datadogConfiguration := tracingConfiguration.Datadog; datadogConfiguration != nil {
+			dd, err := datadog.NewExporter(datadog.Options{
+				Namespace: datadogConfiguration.Namespace,
+				Service:   datadogConfiguration.Service,
+				TraceAddr: datadogConfiguration.TraceAddr,
+				Tags:      datadogConfiguration.Tags,
+				// GlobalTags:             datadogConfiguration.GlobalTags,
+				// DisableCountPerBuckets: datadogConfiguration.DisableCountPerBuckets,
+				// TagMetricNames:         datadogConfiguration.TagMetricNames,
+			})
+			if err != nil {
+				return util.StatusWrap(err, "Failed to create the Datadog exporter")
+			}
+			defer dd.Stop()
+			trace.RegisterExporter(dd)
+			trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 		}
 
 		if stackdriverConfiguration := tracingConfiguration.Stackdriver; stackdriverConfiguration != nil {

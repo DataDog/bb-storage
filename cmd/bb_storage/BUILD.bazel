@@ -1,6 +1,7 @@
 load("//tools:container.bzl", "container_push_official")
 load("@io_bazel_rules_docker//go:image.bzl", "go_image")
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 
 go_library(
     name = "go_default_library",
@@ -39,6 +40,13 @@ go_image(
     embed = [":go_default_library"],
     pure = "on",
     visibility = ["//visibility:public"],
+)
+container_push(
+    name = "bb_storage_publish",
+    image = ":bb_storage_container",
+    format = "Docker",
+    registry = "registry.ddbuild.io",
+    repository = "bb-storage",
 )
 
 container_push_official(

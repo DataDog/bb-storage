@@ -8,6 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/prometheus v0.2.0
 	contrib.go.opencensus.io/exporter/stackdriver v0.12.9
 	github.com/Azure/azure-storage-blob-go v0.10.0
+	github.com/DataDog/opencensus-go-exporter-datadog v0.0.0-20200406135749-5c268882acf0
 	github.com/aws/aws-sdk-go v1.33.12
 	github.com/bazelbuild/remote-apis v0.0.0-20200708200203-1252343900d9
 	github.com/go-redis/redis v6.15.8+incompatible

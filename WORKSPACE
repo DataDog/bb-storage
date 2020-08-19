@@ -54,7 +54,7 @@ go_rules_dependencies()
 
 go_register_toolchains()
 
-load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
 
 gazelle_dependencies()
 
@@ -137,3 +137,38 @@ jsonnet_go_repositories()
 load("@jsonnet_go//bazel:deps.bzl", "jsonnet_go_dependencies")
 
 jsonnet_go_dependencies()
+
+go_repository(
+    name = "com_github_datadog_datadog_go",
+    importpath = "github.com/DataDog/datadog-go",
+    sum = "h1:AShr9cqkF+taHjyQgcBcQUt/ZNK+iPq4ROaZwSX5c/U=",
+    version = "v3.5.0+incompatible",
+)
+
+go_repository(
+    name = "com_github_datadog_opencensus_go_exporter_datadog",
+    importpath = "github.com/DataDog/opencensus-go-exporter-datadog",
+    sum = "h1:Y6HFfo8UuntPOpfmUmLb0o3MNYKfUuH2aNmvypsDbY4=",
+    version = "v0.0.0-20200406135749-5c268882acf0",
+)
+
+go_repository(
+    name = "com_github_philhofer_fwd",
+    importpath = "github.com/philhofer/fwd",
+    sum = "h1:UbZqGr5Y38ApvM/V/jEljVxwocdweyH+vmYvRPBnbqQ=",
+    version = "v1.0.0",
+)
+
+go_repository(
+    name = "com_github_tinylib_msgp",
+    importpath = "github.com/tinylib/msgp",
+    sum = "h1:gWmO7n0Ys2RBEb7GPYB9Ujq8Mk5p2U08lRnmMcGy6BQ=",
+    version = "v1.1.2",
+)
+
+go_repository(
+    name = "in_gopkg_datadog_dd_trace_go_v1",
+    importpath = "gopkg.in/DataDog/dd-trace-go.v1",
+    sum = "h1:gpWsqqkwUldNZXGJqT69NU9MdEDhLboK1C4nMgR0MWw=",
+    version = "v1.22.0",
+)

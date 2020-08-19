@@ -6,6 +6,31 @@ import "google/protobuf/duration.proto";
 
 option go_package = "github.com/buildbarn/bb-storage/pkg/proto/configuration/global";
 
+message DatadogConfiguration {
+  // Namespace specifies the namespaces to which metric keys are appended.
+  string namespace = 1;
+
+  // Service specifies the service name used for tracing.
+  string service   = 2;
+
+  // TraceAddr specifies the host[:port] address of the Datadog Trace Agent.
+	// It defaults to localhost:8126.
+  string trace_addr = 3;
+
+  // Tags specifies a set of global tags to attach to each metric.
+  repeated string tags = 4;
+
+  // GlobalTags holds a set of tags that will automatically be applied to all
+	// exported spans.
+  // map<string, string> global_tags = 5;
+
+  // DisableCountPerBuckets specifies whether to emit count_per_bucket metrics
+  // bool disable_count_per_buckets = 5;
+
+  // TagMetricNames specifies whether to include tags to metric names.
+  // bool tag_metric_names = 6;
+}
+
 message JaegerConfiguration {
   // Jaeger agent endpoint.
   string agent_endpoint = 1;
@@ -68,6 +93,8 @@ message TracingConfiguration {
 
   // Whether or not all traces should be sampled.
   bool always_sample = 4;
+  
+  DatadogConfiguration datadog = 5;
 }
 
 message Configuration {
