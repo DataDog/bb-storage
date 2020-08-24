@@ -34,4 +34,5 @@ require (
 	golang.org/x/sys v0.0.0-20200727154430-2d971f7391a4
 	google.golang.org/genproto v0.0.0-20200726014623-da3ae01ef02d
 	google.golang.org/grpc v1.30.0
+	gopkg.in/DataDog/dd-trace-go.v1 v1.22.0
 )
