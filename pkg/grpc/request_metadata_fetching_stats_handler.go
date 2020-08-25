@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"log"
 
 	remoteexecution "github.com/bazelbuild/remote-apis/build/bazel/remote/execution/v2"
 	"github.com/golang/protobuf/proto"
@@ -35,7 +36,8 @@ func (rmfsh requestMetadataFetchingStatsHandler) TagRPC(ctx context.Context, rti
 	if !span.IsRecordingEvents() {
 		return ctx
 	}
-
+	log.Print("Span context")
+	log.Print(span.SpanContext)
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return ctx
@@ -57,6 +59,8 @@ func (rmfsh requestMetadataFetchingStatsHandler) TagRPC(ctx context.Context, rti
 		trace.StringAttribute("tool_invocation_id", rmd.ToolInvocationId),
 		trace.StringAttribute("correlated_invocations_id", rmd.CorrelatedInvocationsId),
 	)
+	log.Print(ctx)
+	log.Print(span)
 
 	if rmd.ToolDetails != nil {
 		span.AddAttributes(

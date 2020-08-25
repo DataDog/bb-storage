@@ -30,8 +30,8 @@ func ApplyConfiguration(configuration *pb.Configuration) error {
 		if err := view.Register(ocgrpc.DefaultServerViews...); err != nil {
 			return util.StatusWrap(err, "Failed to register ocgrpc server views")
 		}
-		log.Print("Tracing configuration detected")
-		log.Print(tracingConfiguration.Datadog)
+		// log.Print("Tracing configuration detected")
+		// log.Print(tracingConfiguration.Datadog)
 
 		if jaegerConfiguration := tracingConfiguration.Jaeger; jaegerConfiguration != nil {
 			je, err := jaeger.NewExporter(jaeger.Options{
@@ -48,15 +48,12 @@ func ApplyConfiguration(configuration *pb.Configuration) error {
 		}
 
 		if datadogConfiguration := tracingConfiguration.Datadog; datadogConfiguration != nil {
-			log.Print("Tracing configuration detected")
+			// log.Print("Tracing configuration detected")
 			dd, err := datadog.NewExporter(datadog.Options{
 				Namespace: datadogConfiguration.Namespace,
 				Service:   datadogConfiguration.Service,
 				TraceAddr: datadogConfiguration.TraceAddr,
 				Tags:      datadogConfiguration.Tags,
-				// GlobalTags: {"version": "1.2.3"},
-				// DisableCountPerBuckets: datadogConfiguration.DisableCountPerBuckets,
-				// TagMetricNames:         datadogConfiguration.TagMetricNames,
 			})
 
 			if err != nil {

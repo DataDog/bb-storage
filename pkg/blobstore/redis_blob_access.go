@@ -9,6 +9,7 @@ import (
 	"github.com/buildbarn/bb-storage/pkg/digest"
 	"github.com/buildbarn/bb-storage/pkg/util"
 	"github.com/go-redis/redis"
+	"go.opencensus.io/trace"
 
 	"google.golang.org/grpc/codes"
 )
@@ -46,9 +47,12 @@ func NewRedisBlobAccess(redisClient RedisClient,
 }
 
 func (ba *redisBlobAccess) Get(ctx context.Context, digest digest.Digest) buffer.Buffer {
+	_, span := trace.StartSpan(ctx, "RedisBlobAccess.Get")
+	defer span.End()
 	if err := util.StatusFromContext(ctx); err != nil {
 		return buffer.NewBufferFromError(err)
 	}
+
 	key := ba.storageType.GetDigestKey(digest)
 	value, err := ba.redisClient.Get(key).Bytes()
 	if err == redis.Nil {
@@ -65,6 +69,8 @@ func (ba *redisBlobAccess) Get(ctx context.Context, digest digest.Digest) buffer
 }
 
 func (ba *redisBlobAccess) Put(ctx context.Context, digest digest.Digest, b buffer.Buffer) error {
+	_, span := trace.StartSpan(ctx, "RedisBlobAccess.Put")
+	defer span.End()
 	if err := util.StatusFromContext(ctx); err != nil {
 		b.Discard()
 		return err
