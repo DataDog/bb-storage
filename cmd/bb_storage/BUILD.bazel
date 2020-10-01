@@ -41,6 +41,7 @@ go_image(
     pure = "on",
     visibility = ["//visibility:public"],
 )
+
 container_push(
     name = "bb_storage_publish",
     image = ":bb_storage_container",

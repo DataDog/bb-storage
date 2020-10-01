@@ -3,6 +3,7 @@ package blobstore
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/buildbarn/bb-storage/pkg/blobstore/buffer"
@@ -47,6 +48,7 @@ func NewRedisBlobAccess(redisClient RedisClient,
 }
 
 func (ba *redisBlobAccess) Get(ctx context.Context, digest digest.Digest) buffer.Buffer {
+	log.Print("Redis Get")
 	_, span := trace.StartSpan(ctx, "RedisBlobAccess.Get")
 	defer span.End()
 	if err := util.StatusFromContext(ctx); err != nil {
@@ -69,6 +71,7 @@ func (ba *redisBlobAccess) Get(ctx context.Context, digest digest.Digest) buffer
 }
 
 func (ba *redisBlobAccess) Put(ctx context.Context, digest digest.Digest, b buffer.Buffer) error {
+	log.Print("Redis Put")
 	_, span := trace.StartSpan(ctx, "RedisBlobAccess.Put")
 	defer span.End()
 	if err := util.StatusFromContext(ctx); err != nil {

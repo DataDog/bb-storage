@@ -59,7 +59,7 @@ func ApplyConfiguration(configuration *pb.Configuration) error {
 			if err != nil {
 				return util.StatusWrap(err, "Failed to create the Datadog exporter")
 			}
-			defer dd.Stop()
+			// defer dd.Stop()
 			trace.RegisterExporter(dd)
 			trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 			ctx, span := trace.StartSpan(context.Background(), "/foo")

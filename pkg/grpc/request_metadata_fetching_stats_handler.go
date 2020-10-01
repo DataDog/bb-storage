@@ -36,8 +36,6 @@ func (rmfsh requestMetadataFetchingStatsHandler) TagRPC(ctx context.Context, rti
 	if !span.IsRecordingEvents() {
 		return ctx
 	}
-	log.Print("Span context")
-	log.Print(span.SpanContext)
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return ctx
