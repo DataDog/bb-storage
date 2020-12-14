@@ -2,7 +2,6 @@ package blobstore
 
 import (
 	"context"
-	"log"
 
 	"github.com/buildbarn/bb-storage/pkg/blobstore/buffer"
 	"github.com/buildbarn/bb-storage/pkg/digest"
@@ -32,7 +31,6 @@ func NewCloudBlobAccess(bucket *blob.Bucket, keyPrefix string, storageType Stora
 }
 
 func (ba *cloudBlobAccess) Get(ctx context.Context, digest digest.Digest) buffer.Buffer {
-	log.Print("Cloud Get")
 	_, span := trace.StartSpan(ctx, "cloudBlobAccess.Get")
 	defer span.End()
 	key := ba.getKey(digest)
@@ -52,7 +50,6 @@ func (ba *cloudBlobAccess) Get(ctx context.Context, digest digest.Digest) buffer
 }
 
 func (ba *cloudBlobAccess) Put(ctx context.Context, digest digest.Digest, b buffer.Buffer) error {
-	log.Print("Cloud Get")
 	_, span := trace.StartSpan(ctx, "cloudBlobAccess.Get")
 	defer span.End()
 	ctx, cancel := context.WithCancel(ctx)

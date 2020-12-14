@@ -1,7 +1,6 @@
 package global
 
 import (
-	"context"
 	"log"
 	"runtime"
 	"time"
@@ -30,8 +29,6 @@ func ApplyConfiguration(configuration *pb.Configuration) error {
 		if err := view.Register(ocgrpc.DefaultServerViews...); err != nil {
 			return util.StatusWrap(err, "Failed to register ocgrpc server views")
 		}
-		// log.Print("Tracing configuration detected")
-		// log.Print(tracingConfiguration.Datadog)
 
 		if jaegerConfiguration := tracingConfiguration.Jaeger; jaegerConfiguration != nil {
 			je, err := jaeger.NewExporter(jaeger.Options{
@@ -62,9 +59,6 @@ func ApplyConfiguration(configuration *pb.Configuration) error {
 			// defer dd.Stop()
 			trace.RegisterExporter(dd)
 			trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
-			ctx, span := trace.StartSpan(context.Background(), "/foo")
-			log.Print(ctx)
-			span.End()
 		}
 
 		if stackdriverConfiguration := tracingConfiguration.Stackdriver; stackdriverConfiguration != nil {
